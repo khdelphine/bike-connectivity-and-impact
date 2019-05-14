@@ -6,13 +6,16 @@
 # scripts of the project.
 # Project: Connectivity and community impact analysis in Arcpy for potential bicycle infrastructure improvements.
 # Extent: 4 PA Counties in Philadelphia suburbs.
-# Last updated: May 12, 2019
+# Last updated: May 14, 2019
 # Author: Delphine Khanna
 # Organization: Bicycle Coalition of Greater Philadelphia
 # ***************************************
 
+# Import ArcPy and other modules
 import arcpy
 import datetime
+
+# Import local module
 from config import *
 
 # *****************************************
@@ -30,6 +33,13 @@ def load_ancillary_layers():
     arcpy.MakeFeatureLayer_management(common_util_path + "\\boundaries_4_PA_counties", "boundaries_4_PA_counties")
     arcpy.MakeFeatureLayer_management(common_util_path + "\\municipalities_4_PA_counties", "municipalities_4_PA_counties")
     arcpy.MakeFeatureLayer_management(common_util_path + "\\major_cities_4_PA_counties", "major_cities_4_PA_counties")
+    # This is the list of all the CII-related vectors:
+    vectors_to_symbolize = ["major_cities_4_PA_counties",
+                            "municipalities_4_PA_counties",
+                            "boundaries_4_PA_counties",
+                            "extent_4_counties",
+                            "counties_except_delaware"]
+    symbolize_vectors(vectors_to_symbolize)
 
 # Set up the ArcGIS environment variables
 def set_up_env(script_type):

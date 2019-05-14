@@ -5,7 +5,7 @@
 #          based on over 10 criteria of economic and social vulnerability.
 # Project: Connectivity and community impact analysis in Arcpy for potential bicycle infrastructure improvements.
 # Extent: 4 PA Counties in Philadelphia suburbs.
-# Last updated: May 9, 2019
+# Last updated: May 14, 2019
 # Author: Delphine Khanna
 # Organization: Bicycle Coalition of Greater Philadelphia
 # Note: This Arcpy script is meant to run in ArcGIS Desktop. It is NOT optimized for complete unsupervised automation.
@@ -459,10 +459,21 @@ preprocess_layers():
 generate_scores():
     compute_all_aggregated_scores()
 
+symbolize_new_files():
+    rasters_to_symbolize = ["nata_resp_score_ras", "obesity_score_ras",
+                            "bus_score_ras", "trolley_score_ras",
+                            "rail_score_ras", "no_vehicle_score_ras",
+                            "circuit_trails_score_ras", "employment_score_ras",
+                            "pop_density_score_ras", "health_score_ras",
+                            "transportation_score_ras", "density_score_ras",
+                            "ipd_score_ras","cii_overall_score_ras"]
+    symbolize_rasters(rasters_to_symbolize, recalc_stats = "yes")
+
 # ***************************************
 # Begin Main
 print_time_stamp("Start")
 load_and_initiate()
 preprocess_layers()
 generate_scores()
+symbolize_new_files()
 print_time_stamp("Done")
