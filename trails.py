@@ -10,7 +10,7 @@
 # Organization: Bicycle Coalition of Greater Philadelphia
 # Note: This Arcpy script is meant to run in ArcGIS Desktop. It is NOT optimized for complete unsupervised automation.
 # Commands for the ArcGIS Python interpreter, to (1) get into the right directory, and (2) execute this script
-#    import os; os.chdir("C:\Users\delph\Desktop\Github_repos\Connectivity-And-Impact"); execfile(r'trails.py')
+#    import os; os.chdir("C:\\Users\\delph\\Desktop\\Github_repos\\bike-connectivity-and-impact"); execfile(r'trails.py')
 # ***************************************
 
 # Import Arcpy modules:
@@ -21,15 +21,18 @@ import arcpy.da # Data Access
 # Import local modules:
 from config import *
 from utilities import *
+from symbolization import *
+
 
 # *****************************************
 # Functions
 
 # Load the main datasets
 def load_main_data():
-
     # Load the CII score raster
     arcpy.MakeRasterLayer_management(cii_overall_score_ras, "cii_overall_score_ras1")
+    symbolize_rasters(["cii_overall_score_ras1"], recalc_stats = "no")
+    turn_off_layers(["cii_overall_score_ras1"])
 
     # Either we generate all the layers from scratch:
     if COMPUTE_FROM_SCRATCH_OPTION == "yes":
@@ -43,7 +46,7 @@ def load_main_data():
         arcpy.MakeFeatureLayer_management(islands_orig, "islands_orig")
         arcpy.Project_management("islands_orig", "islands_proj", target_spatial_reference, "WGS_1984_(ITRF00)_To_NAD_1983")
 
-        # Remove intermediary layers
+        # Clean up
         remove_intermediary_layers(["trails_converted", "islands_orig"])
 
     # Or we can load the layers already preprocessed:
@@ -52,7 +55,8 @@ def load_main_data():
         arcpy.MakeFeatureLayer_management("trails", "trails")
         arcpy.MakeFeatureLayer_management("trails_intersecting", "trails_intersecting")
         arcpy.MakeFeatureLayer_management("trails_intersecting_gte_2", "trails_intersecting_gte_2")
-
+        # Clean up
+        turn_off_layers(["islands_with_score", "trails", "trails_intersecting", "trails_intersecting_gte_2"])
 
 # Prepare the LTS1-2 Islands layer
 def prep_islands():
@@ -115,8 +119,10 @@ def compute_CII_per_island():
         if field.aliasName in ["STRONG", "Orig_Length", "CII_Score_Overall"]:
             arcpy.AlterField_management("islands_with_score", field.name, field.aliasName)
 
-    # Remove intermediary layer
-    remove_intermediary_layers(["islands_with_CII_scores_table", "islands_with_score_with_nulls"])
+    # Clean up
+    remove_intermediary_layers(["buffered_islands","islands_with_CII_scores_table", "islands_with_score_with_nulls"])
+    turn_off_layers(["islands_with_score"])
+
 
 # Prepare the Non-Circuit Trails layer
 def prep_trails():
@@ -131,8 +137,9 @@ def prep_trails():
     arcpy.SpatialJoin_analysis("trails_proj", "extent_4_counties", "trails",
                             "JOIN_ONE_TO_ONE", "KEEP_COMMON", match_option="INTERSECT")
 
-    # Remove intermediary layers
+    # Clean up
     remove_intermediary_layers(["trails_proj"])
+    turn_off_layers(["trails"])
 
 
 # Set the merge rules in the fieldMappings for a spatial join
@@ -170,8 +177,10 @@ def find_trail_island_intersections():
     # Delete an unnecessary field
     drop_fields = ["TARGET_FID"]
     arcpy.DeleteField_management("trails_intersecting", drop_fields)
-    # Remove intermediary layer
+
+    # Clean up
     remove_intermediary_layers([])
+    turn_off_layers(["trails_intersecting"])
 
 # Keep only the trails that intersect with 2 islands or more
 def filter_2_or_more_islands():
@@ -180,6 +189,7 @@ def filter_2_or_more_islands():
     # Save to a new feature class and do some clean up
     arcpy.CopyFeatures_management("trails_intersecting", "trails_intersecting_gte_2")
     arcpy.SelectLayerByAttribute_management("trails_intersecting", "CLEAR_SELECTION")
+    turn_off_layers(["trails_intersecting_gte_2"])
 
 # Compute the final score for each Non-Circuit Trail
 def compute_trail_scores():
@@ -247,6 +257,7 @@ def generate_trail_subsets_per_county():
                                                 "NEW_SELECTION", expr)
         arcpy.CopyFeatures_management("trails_intersect_gte2_counties", "trails_intersect_gte_2_" + county)
         arcpy.SelectLayerByAttribute_management("trails_intersect_gte2_counties", "CLEAR_SELECTION")
+        symbolize_vectors("trails_intersect_gte_2_" + county, lyr_file_param = "trails_intersect_gte_2")
 
         # Add a field where we put a normalized overall score so that each county
         # has a max value that is a true 20
@@ -260,17 +271,20 @@ def generate_trail_subsets_per_county():
         print(overall_score_norm_expr)
         arcpy.CalculateField_management("trails_intersect_gte_2_" + county, "Norm_Overall_Score_Per_County", overall_score_norm_expr, "PYTHON_9.3")
 
+
 # Rank each county-specific trail feature class
 def generate_ranked_subsets_per_county():
     for county in county_list:
         generate_ranked_subset("trails_intersect_gte_2_" + county, "Norm_Overall_Score_Per_County", "trails_top_score_ranked_" + county)
+        symbolize_vectors(["trails_top_score_ranked_" + county], lyr_file_param = "trails_top_score")
+        symbolize_vectors(["trails_top_score_ranked_" + county + "_Top20"], lyr_file_param = "trails_top20_score")
 
 def load_and_initiate():
     if COMPUTE_FROM_SCRATCH_OPTION == "yes":
         prep_gdb()
-    #load_ancillary_layers()
+    load_ancillary_layers()
     set_up_env("trails")
-    #load_main_data()
+    load_main_data()
 
 def preprocess_layers():
     if COMPUTE_FROM_SCRATCH_OPTION == "yes":
@@ -281,14 +295,10 @@ def preprocess_layers():
         filter_2_or_more_islands()
 
 def generate_scores():
-    #compute_trail_scores()
-    #generate_ranked_subsets()
-    #generate_trail_subsets_per_county()
+    compute_trail_scores()
+    generate_ranked_subsets()
+    generate_trail_subsets_per_county()
     generate_ranked_subsets_per_county()
-
-def symbolize_new_files():
-    #symbolize_vectors(vectors_to_symbolize)
-    symbolize_rasters(["cii_overall_score_ras1"], recalc_stats = "no")
 
 # ***************************************
 # Begin Main
@@ -296,5 +306,4 @@ print_time_stamp("Start")
 load_and_initiate()
 preprocess_layers()
 generate_scores()
-symbolize_new_files()
 print_time_stamp("Done")

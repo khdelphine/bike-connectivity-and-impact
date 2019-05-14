@@ -1,15 +1,13 @@
 # ***************************************
 # ***Overview***
 # Script name: symbolization.py
-# Purpose: This Arcpy script applies chosen symbolizations to a list of vectors and rasters.
+# Purpose: This Arcpy module applies chosen symbolizations to a list of vectors and rasters.
 # Project: Connectivity and community impact analysis in Arcpy for potential bicycle infrastructure improvements.
 # Extent: 4 PA Counties in Philadelphia suburbs.
 # Last updated: May 14, 2019
 # Author: Delphine Khanna
 # Organization: Bicycle Coalition of Greater Philadelphia
 # Note: This Arcpy script is meant to run in ArcGIS Desktop. It is NOT optimized for complete unsupervised automation.
-# Commands for the ArcGIS Python interpreter, to (1) get into the right directory, and (2) execute this script
-#   import os; os.chdir("C:\Users\delph\Desktop\Github_repos\Connectivity-And-Impact"); execfile(r'symbolization.py')
 # ***************************************
 
 # Import Arcpy module
@@ -22,7 +20,7 @@ from config import *
 # Functions
 
 # Apply the chosen symbolization to each vector layer
-def symbolize_vectors(vectors_to_symbolize):
+def symbolize_vectors(vectors_to_symbolize, lyr_file_param=""):
     mxd = arcpy.mapping.MapDocument("CURRENT")
     df = arcpy.mapping.ListDataFrames(mxd)[0]
 
@@ -31,10 +29,13 @@ def symbolize_vectors(vectors_to_symbolize):
         # Check if it is in the list of vector layers:
         if lyr.name in vectors_to_symbolize:
             # Get the chosen Lyr template used
-            lyrFile = arcpy.mapping.Layer(base_path + "\\Lyr\\" + lyr.name + ".lyr")
+            if len(lyr_file_param) > 0:
+                lyr_file = arcpy.mapping.Layer(base_path + "\\Lyr\\" + lyr_file_param + ".lyr")
+            else:
+                lyr_file = arcpy.mapping.Layer(base_path + "\\Lyr\\" + lyr.name + ".lyr")
             print("Symbolize:" + lyr.name)
             # Apply the Lyr template to it
-            arcpy.mapping.UpdateLayer(df, lyr, lyrFile, True)
+            arcpy.mapping.UpdateLayer(df, lyr, lyr_file, True)
     # Refresh the display of the mxd
     arcpy.RefreshActiveView()
     arcpy.RefreshTOC()
@@ -57,7 +58,7 @@ def apply_raster_symbolization(rasters_to_symbolize):
     mxd = arcpy.mapping.MapDocument("CURRENT")
     df = arcpy.mapping.ListDataFrames(mxd)[0]
     # Get the chosen Lyr template used
-    lyrFile = arcpy.mapping.Layer(base_path + "\\Lyr\\cii_overall_score_ras1e.lyr")
+    lyr_file = arcpy.mapping.Layer(base_path + "\\Lyr\\cii_overall_score_ras1e.lyr")
 
     # Loop through every layer in the mxd document
     for lyr in arcpy.mapping.ListLayers(mxd, "", df):
@@ -65,7 +66,7 @@ def apply_raster_symbolization(rasters_to_symbolize):
         if lyr.name in rasters_to_symbolize:
             print("Symbolize:" + lyr.name)
             # If so, apply the Lyr template to it
-            arcpy.mapping.UpdateLayer(df, lyr, lyrFile, True)
+            arcpy.mapping.UpdateLayer(df, lyr, lyr_file, True)
             # And reclassify, so that the classification breaks are adapted #
             # the current raster
             lyr.symbology.reclassify()

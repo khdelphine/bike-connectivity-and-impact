@@ -17,6 +17,7 @@ import datetime
 
 # Import local module
 from config import *
+from symbolization import *
 
 # *****************************************
 # Functions
@@ -40,6 +41,7 @@ def load_ancillary_layers():
                             "extent_4_counties",
                             "counties_except_delaware"]
     symbolize_vectors(vectors_to_symbolize)
+    turn_off_layers(vectors_to_symbolize)
 
 # Set up the ArcGIS environment variables
 def set_up_env(script_type):
@@ -73,6 +75,16 @@ def remove_intermediary_layers(layers_to_remove):
         for lyr in arcpy.mapping.ListLayers(mxd, "", df):
             if lyr.name in layers_to_remove:
                 arcpy.mapping.RemoveLayer(df, lyr)
+
+# Turn off some of the layers in the mxd to avoid visual cluttering
+def turn_off_layers(layers_to_turn_off):
+    mxd=arcpy.mapping.MapDocument("CURRENT")
+    df = arcpy.mapping.ListDataFrames(mxd)[0]
+    for lyr in arcpy.mapping.ListLayers(mxd, "", df):
+        if lyr.name in layers_to_turn_off:
+            lyr.visible = False
+    arcpy.RefreshTOC()
+    arcpy.RefreshActiveView()
 
 # Get the maximum value for a feature class attribute across all rows
 def get_max(feat_class, attribute):

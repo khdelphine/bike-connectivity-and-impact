@@ -11,9 +11,9 @@
 # Note: This Arcpy script is meant to run in ArcGIS Desktop. It is NOT optimized for complete unsupervised automation.
 # Note2: The prep steps for the 10 datasets is too idiosyncratic to each dataset to
 #        to implement any common functions. So I just process them one after the other.
-# Commands for the ArcGIS Python interpreter:
-#    1. To get into the current directory: import os; os.chdir("C:\Users\delph\Desktop\Github_repos\Connectivity-And-Impact")
-#    2. Execute this file: execfile(r'community_impact_index.py')
+# Commands for the ArcGIS Python interpreter, to (1) get into the right directory, and (2) execute this script
+#           import os; os.chdir("C:\\Users\\delph\\Desktop\\Github_repos\\bike-connectivity-and-impact"); execfile(r'community_impact_index.py')
+
 # ***************************************
 
 # Import Arcpy modules:
@@ -23,6 +23,8 @@ import arcpy.sa # Spatial Analyst
 # Import local modules:
 from config import *
 from utilities import *
+from symbolization import *
+
 
 # *****************************************
 # Functions

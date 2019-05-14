@@ -10,7 +10,7 @@
 # Organization: Bicycle Coalition of Greater Philadelphia
 # Note: This Arcpy script is meant to run in ArcGIS Desktop. It is NOT optimized for complete unsupervised automation.
 # Commands for the ArcGIS Python interpreter, to (1) get into the right directory, and (2) execute this script
-#           import os; os.chdir("C:\Users\delph\Desktop\Github_repos\Connectivity-And-Impact"); execfile(r'roads.py')
+#           import os; os.chdir("C:\\Users\\delph\\Desktop\\Github_repos\\bike-connectivity-and-impact"); execfile(r'roads.py')
 # ***************************************
 
 # Import Arcpy modules:
@@ -21,6 +21,7 @@ import arcpy.da # Data Access
 # Import local modules:
 from config import *
 from utilities import *
+from symbolization import *
 
 num_of_score_tables = 0
 
