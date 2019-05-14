@@ -5,6 +5,10 @@ This work is based on the data produced by the DVRPC Bicycle LTS and Connectivit
 * Bike Stress LTS 1 & 2 Islands (DVRPC, 2017a): clusters of low-stress, highly bikable roads
 * Bike Stress Suburban LTS 3 Connections (DVRPC, 2017b): medium-stress LTS3 road segments, ranked by connectivity level, in relation to LTS 1 & 2 islands.
 
+Other datasets used come from DVRPC, U.S. Census, the Bicycle Coalition of Greater Philadelphia, EPA, and SEPTA.
+
+This project was developed for the Bicycle Coalition of Greater Philadelphia.
+
 ## Goals
 * Identify the non-circuit trails that: 
   * Connect the most LTS1-2 islands
