@@ -37,11 +37,13 @@ def load_ancillary_layers():
     # This is the list of all the CII-related vectors:
     vectors_to_symbolize = ["major_cities_4_PA_counties",
                             "municipalities_4_PA_counties",
-                            "boundaries_4_PA_counties",
                             "extent_4_counties",
                             "counties_except_delaware"]
     symbolize_vectors(vectors_to_symbolize)
     turn_off_layers(vectors_to_symbolize)
+    # boundaries_4_PA_counties should be symbolized but not turned off
+    symbolize_vectors([boundaries_4_PA_counties])
+
 
 # Set up the ArcGIS environment variables
 def set_up_env(script_type):

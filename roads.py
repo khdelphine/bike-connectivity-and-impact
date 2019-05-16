@@ -140,10 +140,8 @@ def aggregate_all_zonalTables():
 
 # Compute the overall LTS3 scores
 def compute_overall_scores():
-    # Add a new field Total_Score, and put in it the sum of the CII score (normalized
-    # by the max CII score to truly get a score out of 20) +
-    # the connectivity score (normalized by the max connectivity score).
-    # The name of the original attributes are MEAN and TOTAL, respectively.
+    # Create a new field and add in it the original CII score (i.e., MEAN)
+    # normalized by the max CII score (to truly get a score out of 20)
     arcpy.AddField_management("aggregated_lts3_top30pct_with_cii_scores", "CII_Score", "Double")
     mean_max = get_max("aggregated_lts3_top30pct_with_cii_scores",
                         "merged_lts3_with_CII_scores_table_MEAN")
@@ -151,14 +149,17 @@ def compute_overall_scores():
     arcpy.CalculateField_management("aggregated_lts3_top30pct_with_cii_scores", "CII_Score",
                                     cii_score_norm_expr, "PYTHON_9.3")
 
+    # Create a new field and add in it the original connectivity score (i.e., TOTAL)
+    # normalized by the max connectivity score (to truly get a score out of 20)
     arcpy.AddField_management("aggregated_lts3_top30pct_with_cii_scores", "Connectivity_Score", "Double")
     total_max = get_max("aggregated_lts3_top30pct_with_cii_scores","lts3_top30pct_TOTAL")
     conn_score_norm_expr = "(float(!lts3_top30pct_TOTAL!) / " + str(total_max) + ")*20"
     arcpy.CalculateField_management("aggregated_lts3_top30pct_with_cii_scores", "Connectivity_Score",
                                         conn_score_norm_expr, "PYTHON_9.3")
 
+    # Add a new field Overall_Score, and aggregate in it the two scores: 2/3 CII score
+    # + 1/3 Connectivity score
     arcpy.AddField_management("aggregated_lts3_top30pct_with_cii_scores", "Overall_Score", "Double")
-    #Aggregate the two scores: 2/3 CII score + 1/3 Connectivity score
     overall_score_expr = "(!CII_Score! * 0.67) + (!Connectivity_Score!*0.33)"
     arcpy.CalculateField_management("aggregated_lts3_top30pct_with_cii_scores", "Overall_Score",
                                         overall_score_expr, "PYTHON_9.3")
