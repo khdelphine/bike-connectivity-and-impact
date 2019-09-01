@@ -224,9 +224,9 @@ def generate_LTS3_10pct_subsets_per_county():
 def load_and_initiate():
     if COMPUTE_FROM_SCRATCH_OPTION == "yes":
         prep_gdb()
-    #load_ancillary_layers()
+    load_ancillary_layers()
     set_up_env("roads")
-    #load_main_data()
+    load_main_data()
 
 def preprocess_layers():
     if COMPUTE_FROM_SCRATCH_OPTION == "yes":
@@ -236,19 +236,19 @@ def preprocess_layers():
         aggregate_all_zonalTables()
 
 def generate_scores():
-    #compute_overall_scores()
+    compute_overall_scores()
     generate_LTS3_subsets_per_county()
     generate_LTS3_10pct_subsets_per_county()
 
 def symbolize_new_files():
-    #symbolize_vectors(vectors_to_symbolize)
+    symbolize_vectors(vectors_to_symbolize)
     symbolize_rasters(["cii_overall_score_ras1"], recalc_stats = "no")
 
 # ***************************************
 # Begin Main
 print_time_stamp("Start")
 load_and_initiate()
-#preprocess_layers()
+preprocess_layers()
 generate_scores()
 symbolize_new_files()
 print_time_stamp("Done")
