@@ -58,16 +58,18 @@ This project was developed for the Bicycle Coalition of Greater Philadelphia.
 * Perform a Spatial Join to join the islands to the non-circuit trails, using the option ONE-to-ONE. Use merge rules to (1) count the number of islands intersected by each trail,  (2) sum up the total road length that those islands represent, and (3) average the islands’ CII scores. A radius of 50 meters is used.
 * Compute an overall 1-to-20 score for each trail based on: ⅓ for the number of islands intersected, ⅓ for the total island length and ⅓ for their CII scores.   
 * For each county, create a separate feature class, and rank the trails based on their overall score.
-* Output: Rank trails for each county.
 
-### 3. Identify high-priority LTS3 road segments*
+**Output**: Rank trails for each county.
+
+### 3. Identify high-priority LTS3 road segments
 * Select the top 30% highest connectivity LTS-3 segments (which is based on how many Census block connections they could enable).
 * Create a 1-mile buffer around them, as a rough method to account for the target census blocks they connect.
 * Use Zonal Statistics As Table to compute the CII score for each buffered LTS-3 segment.
 * Note: it would have been more accurate to use the CII scores for the Census blocks that each LTS-3 segment connects, but we did not have direct access to that data.
 * Compute an overall 1-to-20 score composed of: ⅓ for the connectivity score and ⅔ for the CII score. 
 * For each county, create a separate feature class, and rank the LTS-3 segments based on their overall score. Select the top third LTS-3 segments based on their overall scores.
-* Output: a new subset of 10% highest priority LTS-3 segments.
+
+**Output**: a new subset of 10% highest priority LTS-3 segments.
 
 ## References
 Moran, S. (2017, November 27). DVRPC Bicycle LTS and Connectivity Analysis Documentation [Memo]. Retrieved from
