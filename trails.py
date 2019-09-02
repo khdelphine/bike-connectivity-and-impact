@@ -1,6 +1,7 @@
 
 # ***************************************
 # ***Overview***
+
 # Script name: trails.py
 # Purpose: This Arcpy script identifies the non-circuit trails with the highest connectivity and community impact score.
 # Project: Connectivity and community impact analysis in Arcpy for potential bicycle infrastructure improvements.
@@ -239,10 +240,9 @@ def generate_ranked_subset(in_feature_class, ranking_attribute, out_feature_clas
     arcpy.CopyFeatures_management(out_feature_class, out_feature_class + "_Top20" )
     arcpy.SelectLayerByAttribute_management(out_feature_class, "CLEAR_SELECTION")
 
-# Generate trail feature classes ranked by the final overall score or only by the length of all intersecting islands
+# Generate trail feature classes ranked by the final overall score:
 def generate_ranked_subsets():
     generate_ranked_subset("trails_intersecting_gte_2", "Overall_Score", "trails_top_score_ranked")
-    generate_ranked_subset("trails_intersecting_gte_2", "Length_of_All_Islands", "trails_longest_islands_ranked")
 
 # Generate scored trail features classes for each county
 def generate_trail_subsets_per_county():
