@@ -50,7 +50,7 @@ This project was developed for the Bicycle Coalition of Greater Philadelphia.
   * Obesity: 5%
   * Respiratory hazards: 5%
 
-**Output**: one CII score raster.
+**Output**: One CII score raster.
 
 ### 2. Identify high-priority non-circuit trails
 * Create a buffer of 100 meters around the LTS-1 & 2 islands.
