@@ -41,9 +41,9 @@ def load_main_data():
         arcpy.MakeFeatureLayer_management("aggregated_lts3_top30pct_with_cii_scores",
                                         "aggregated_lts3_top30pct_with_cii_scores")
 
-# Select the top 30% LTS3 road segments
+# Select the top 30% LTS3 road segments. Note: those are the top 30% for each county, not overall.
 def select_top30pct_lts3():
-    # Select the top 30% LTS3 road segments using the attribute Top30percent
+    # Select the top 30% LTS3 road segments using the attribute Top30percent. 
     arcpy.SelectLayerByAttribute_management("lts3_orig", "NEW_SELECTION", "Top30perce = 1")
     # Save to a new feature class and do some clean up
     arcpy.CopyFeatures_management("lts3_orig", "lts3_top30pct")
@@ -54,7 +54,7 @@ def buffer_lts3():
     arcpy.Buffer_analysis("lts3_top30pct", "lts3_top30pct_buffered", "1609.34 Meters", "FULL", "ROUND")
 
 # Compute CII scores per LTS3 road segment. The loop is a work around the fact that
-# arcpy.sa.ZonalStatisticsAsTable() does not work for overlapping zone.
+# arcpy.sa.ZonalStatisticsAsTable() does not work for overlapping zones.
 def compute_CII_scores_per_lts3():
     # Prepare everything before the loop
     arcpy.CheckOutExtension("Spatial")
@@ -182,7 +182,6 @@ def generate_LTS3_subsets_per_county():
         arcpy.CalculateField_management("lts3_with_cii_scores_" + county, "Norm_Overall_Score_Per_County", overall_score_norm_expr, "PYTHON_9.3")
 
 # Rank an LTS3 subsets according to a specific attribute and select the top third.
-# Also select the top 20 rows.
 def generate_top_ranked_subset(in_feature_class, ranking_attribute, out_feature_class):
     # Sort the feature class
     arcpy.Sort_management(in_feature_class, out_feature_class, [[ranking_attribute, "DESCENDING"]])
@@ -198,12 +197,7 @@ def generate_top_ranked_subset(in_feature_class, ranking_attribute, out_feature_
     arcpy.CopyFeatures_management(out_feature_class, out_feature_class + "_top10pct" )
     arcpy.SelectLayerByAttribute_management(out_feature_class, "CLEAR_SELECTION")
 
-    #  Create a new feature class with the top 20 rows
-    arcpy.SelectLayerByAttribute_management(out_feature_class, "NEW_SELECTION", "Rank <= 20")
-    arcpy.CopyFeatures_management(out_feature_class, out_feature_class + "_top20" )
-    arcpy.SelectLayerByAttribute_management(out_feature_class, "CLEAR_SELECTION")
-
-# Generate the original top 10% subset for a specific county
+# Generate the original top 10% subset for a specific county. This is for comparison's sake.
 def generate_LTS3_orig_10pct_subsets_per_county(county_name):
     # Select the top 10% LTS3 road segments using the original attribute Top10percent
     arcpy.SelectLayerByAttribute_management("lts3_with_cii_scores_" + county_name, "NEW_SELECTION",
@@ -214,7 +208,7 @@ def generate_LTS3_orig_10pct_subsets_per_county(county_name):
     arcpy.SelectLayerByAttribute_management("lts3_with_cii_scores_" + county_name, "CLEAR_SELECTION")
 
 # Generate top 10% subsets for all 4 counties and on two different sorting criteria:
-# the new overall score and the original connectivity score)
+# the new overall score and the original connectivity score. The latter is for comparison's sake.
 def generate_LTS3_10pct_subsets_per_county():
     for county in county_list:
         generate_top_ranked_subset("lts3_with_cii_scores_" + county, "Norm_Overall_Score_Per_County",
