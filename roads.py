@@ -5,7 +5,7 @@
 # Purpose: This Arcpy script identifies the LTS3 road segments with the highest connectivity and community impact score.
 # Project: Connectivity and community impact analysis in Arcpy for potential bicycle infrastructure improvements.
 # Extent: 4 PA Counties in Philadelphia suburbs.
-# Last updated: May 14, 2019
+# Last updated: Sep 2, 2019
 # Author: Delphine Khanna
 # Organization: Bicycle Coalition of Greater Philadelphia
 # Note: This Arcpy script is meant to run in ArcGIS Desktop. It is NOT optimized for complete unsupervised automation.
@@ -207,7 +207,7 @@ def generate_LTS3_orig_10pct_subsets_per_county(county_name):
                                   "lts3_orig_10pct_ranked_" + county_name)
     arcpy.SelectLayerByAttribute_management("lts3_with_cii_scores_" + county_name, "CLEAR_SELECTION")
 
-# Generate top 10% subsets for all 4 counties and on two different sorting criteria:
+# For each county, generate top 10% subsets based on two different criteria:
 # the new overall score and the original connectivity score. The latter is for comparison's sake.
 def generate_LTS3_10pct_subsets_per_county():
     for county in county_list:
