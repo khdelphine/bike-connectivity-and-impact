@@ -50,7 +50,7 @@ This project was developed for the Bicycle Coalition of Greater Philadelphia.
   * Obesity: 5%
   * Respiratory hazards: 5%
 
-**Output**: CII score raster.
+**Output**: one CII score raster.
 
 ### 2. Identify high-priority non-circuit trails
 * Create a buffer of 100 meters around the LTS-1 & 2 islands.
@@ -59,7 +59,7 @@ This project was developed for the Bicycle Coalition of Greater Philadelphia.
 * Compute an overall 1-to-20 score for each trail based on: ⅓ for the number of islands intersected, ⅓ for the total island length and ⅓ for their CII scores.   
 * For each county, create a separate feature class, and rank the trails based on their overall score.
 
-**Output**: Rank trails for each county.
+**Output**: Rank trails for each county (four feature classes).
 
 ### 3. Identify high-priority LTS3 road segments
 * Select the top 30% highest connectivity LTS-3 segments (which is based on how many Census block connections they could enable).
@@ -69,7 +69,7 @@ This project was developed for the Bicycle Coalition of Greater Philadelphia.
 * Compute an overall 1-to-20 score composed of: ⅓ for the connectivity score and ⅔ for the CII score. 
 * For each county, create a separate feature class, and rank the LTS-3 segments based on their overall score. Select the top third LTS-3 segments based on their overall scores.
 
-**Output**: a new subset of 10% highest priority LTS-3 segments.
+**Output**: A new subset of 10% highest priority LTS-3 segments for each county (four feature classes).
 
 ## References
 Moran, S. (2017, November 27). DVRPC Bicycle LTS and Connectivity Analysis Documentation [Memo]. Retrieved from
