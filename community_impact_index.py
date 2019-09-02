@@ -79,7 +79,6 @@ def prep_pop_density_dataset():
     arcpy.SpatialJoin_analysis(pa_census_tracts_proj, "extent_4_counties", "pa_census_tracts_clipped",
                               "JOIN_ONE_TO_ONE", "KEEP_COMMON", match_option="HAVE_THEIR_CENTER_IN")
     # Remove the extra tract that got included because of its weirdly-placed centroid
-    # XXX This does not work the way it should XXX
     arcpy.SelectLayerByAttribute_management("pa_census_tracts_clipped", "NEW_SELECTION",
                                             "GEOID <> '42101006500'")
     # Save to a new feature class and do some clean up
@@ -131,7 +130,7 @@ def prep_pop_density_dataset():
 # Prepare the Employment Density dataset
 def prep_employment_dataset():
     # Local variables
-    employment_clipped = data_path + "\\XXXstop_gap.gdb\\Employment_BusinessPatternZip_with_pop_DVRPC_Counties"
+    employment_clipped = orig_datasets_path + "\\Pre_Processed.gdb\\Employment_BusinessPatternZip_with_pop_DVRPC_Counties"
 
     # Display the raster
     arcpy.MakeFeatureLayer_management(employment_clipped, "employment_clipped")
@@ -350,7 +349,7 @@ def prep_bus_dataset():
 # Prepare the NATA Respiratory Hazards dataset
 def prep_nata_resp_dataset():
     # Local variables
-    ejscreen_orig = data_path + "\\XXXstop_gap.gdb\\Health_JSCREEN_Tract_DVRPC_9_Counties_proj"
+    ejscreen_orig = orig_datasets_path + "\\Pre_Processed.gdb\\Health_JSCREEN_Tract_DVRPC_9_Counties_proj"
 
     # Load the feature class and table into the MXD
     arcpy.MakeFeatureLayer_management(ejscreen_orig, "ejscreen_orig")
@@ -374,7 +373,7 @@ def prep_nata_resp_dataset():
 
 # Prepare the Obesity Rate dataset
 def prep_obesity_dataset():
-    obesity_ras = data_path + "\\XXXstop_gap.gdb\\Obesity_PA_normalized_ras"
+    obesity_ras = orig_datasets_path + "\\Pre_Processed.gdb\\Obesity_PA_normalized_ras"
 
     # Display the raster
     arcpy.MakeRasterLayer_management(obesity_ras, "obesity_ras1")
