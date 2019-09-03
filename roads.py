@@ -33,13 +33,18 @@ def load_main_data():
     # Load the LTS3 feature class into the MXD
     arcpy.MakeFeatureLayer_management(lts3_orig, "lts3_orig")
     # NO need to reproject (already in NAD 1983 UTM Zone 18N)
+    symbolize_vectors("lts3_orig", lyr_file_param = "lts3_orig")
+
     # Load the CII overall score raster into the MXD
     arcpy.MakeRasterLayer_management(cii_overall_score_ras, "cii_overall_score_ras1")
+    symbolize_rasters(["cii_overall_score_ras1"], recalc_stats = "no")
+    turn_off_layers(["cii_overall_score_ras1"])
 
     # We have the option to load the layers already preprocessed instead of generating them from scratch:
     if COMPUTE_FROM_SCRATCH_OPTION == "no":
         arcpy.MakeFeatureLayer_management("aggregated_lts3_top30pct_with_cii_scores",
                                         "aggregated_lts3_top30pct_with_cii_scores")
+        turn_off_layers(["aggregated_lts3_top30pct_with_cii_scores"])
 
 # Select the top 30% LTS3 road segments
 def select_top30pct_lts3():
@@ -173,6 +178,7 @@ def generate_LTS3_subsets_per_county():
                                                 "NEW_SELECTION", expr)
         arcpy.CopyFeatures_management("aggregated_lts3_top30pct_with_cii_scores", "lts3_with_cii_scores_" + county)
         arcpy.SelectLayerByAttribute_management("aggregated_lts3_top30pct_with_cii_scores", "CLEAR_SELECTION")
+        symbolize_vectors("aggregated_lts3_top30pct_with_cii_scores", lyr_file_param = "lts3_top_30pct")
 
         # Add a field where we put a normalized overall score so that each county
         # has a max value that is a true 20
@@ -182,7 +188,6 @@ def generate_LTS3_subsets_per_county():
         arcpy.CalculateField_management("lts3_with_cii_scores_" + county, "Norm_Overall_Score_Per_County", overall_score_norm_expr, "PYTHON_9.3")
 
 # Rank an LTS3 subsets according to a specific attribute and select the top third.
-# Also select the top 20 rows.
 def generate_top_ranked_subset(in_feature_class, ranking_attribute, out_feature_class):
     # Sort the feature class
     arcpy.Sort_management(in_feature_class, out_feature_class, [[ranking_attribute, "DESCENDING"]])
@@ -197,11 +202,7 @@ def generate_top_ranked_subset(in_feature_class, ranking_attribute, out_feature_
     arcpy.SelectLayerByAttribute_management(out_feature_class, "NEW_SELECTION", "Rank <= " + str(one_third_rows))
     arcpy.CopyFeatures_management(out_feature_class, out_feature_class + "_top10pct" )
     arcpy.SelectLayerByAttribute_management(out_feature_class, "CLEAR_SELECTION")
-
-    #  Create a new feature class with the top 20 rows
-    arcpy.SelectLayerByAttribute_management(out_feature_class, "NEW_SELECTION", "Rank <= 20")
-    arcpy.CopyFeatures_management(out_feature_class, out_feature_class + "_top20" )
-    arcpy.SelectLayerByAttribute_management(out_feature_class, "CLEAR_SELECTION")
+    symbolize_vectors(out_feature_class, lyr_file_param = "lts3_overall_score_top10pct")
 
 # Generate the original top 10% subset for a specific county
 def generate_LTS3_orig_10pct_subsets_per_county(county_name):
@@ -212,6 +213,7 @@ def generate_LTS3_orig_10pct_subsets_per_county(county_name):
     arcpy.CopyFeatures_management("lts3_with_cii_scores_" + county_name,
                                   "lts3_orig_10pct_ranked_" + county_name)
     arcpy.SelectLayerByAttribute_management("lts3_with_cii_scores_" + county_name, "CLEAR_SELECTION")
+    symbolize_vectors("lts3_with_cii_scores_" + county, lyr_file_param = "lts3_orig_10pct")
 
 # Generate top 10% subsets for all 4 counties and on two different sorting criteria:
 # the new overall score and the original connectivity score)
@@ -226,7 +228,7 @@ def load_and_initiate():
         prep_gdb()
     #load_ancillary_layers()
     set_up_env("roads")
-    #load_main_data()
+    load_main_data()
 
 def preprocess_layers():
     if COMPUTE_FROM_SCRATCH_OPTION == "yes":
@@ -240,15 +242,10 @@ def generate_scores():
     generate_LTS3_subsets_per_county()
     generate_LTS3_10pct_subsets_per_county()
 
-def symbolize_new_files():
-    #symbolize_vectors(vectors_to_symbolize)
-    symbolize_rasters(["cii_overall_score_ras1"], recalc_stats = "no")
-
 # ***************************************
 # Begin Main
 print_time_stamp("Start")
 load_and_initiate()
 #preprocess_layers()
 generate_scores()
-symbolize_new_files()
 print_time_stamp("Done")
