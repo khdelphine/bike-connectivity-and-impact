@@ -1,11 +1,12 @@
 
 # ***************************************
 # ***Overview***
+
 # Script name: trails.py
 # Purpose: This Arcpy script identifies the non-circuit trails with the highest connectivity and community impact score.
 # Project: Connectivity and community impact analysis in Arcpy for potential bicycle infrastructure improvements.
 # Extent: 4 PA Counties in Philadelphia suburbs.
-# Last updated: May 14, 2019
+# Last updated: Sep 2, 2019
 # Author: Delphine Khanna
 # Organization: Bicycle Coalition of Greater Philadelphia
 # Note: This Arcpy script is meant to run in ArcGIS Desktop. It is NOT optimized for complete unsupervised automation.
@@ -227,23 +228,6 @@ def compute_trail_scores():
     arcpy.CalculateField_management("trails_intersecting_gte_2", "Overall_Score",
                                     expr, "PYTHON_9.3")
 
-# Rank a feature class features according to a specific attribute value
-def generate_ranked_subset(in_feature_class, ranking_attribute, out_feature_class):
-    # Sort the attribute table
-    arcpy.Sort_management(in_feature_class, out_feature_class, [[ranking_attribute, "DESCENDING"]])
-    # Add a Rank attribute and populate it
-    arcpy.AddField_management(out_feature_class, "Rank", "LONG")
-    arcpy.CalculateField_management(out_feature_class, "Rank", "!OBJECTID!", "PYTHON_9.3")
-    # Also generate a separate feature class with the top 20 values
-    arcpy.SelectLayerByAttribute_management(out_feature_class, "NEW_SELECTION", "Rank <= 20")
-    arcpy.CopyFeatures_management(out_feature_class, out_feature_class + "_Top20" )
-    arcpy.SelectLayerByAttribute_management(out_feature_class, "CLEAR_SELECTION")
-
-# Generate trail feature classes ranked by the final overall score or only by the length of all intersecting islands
-def generate_ranked_subsets():
-    generate_ranked_subset("trails_intersecting_gte_2", "Overall_Score", "trails_top_score_ranked")
-    generate_ranked_subset("trails_intersecting_gte_2", "Length_of_All_Islands", "trails_longest_islands_ranked")
-
 # Generate scored trail features classes for each county
 def generate_trail_subsets_per_county():
     # Use a spatial join to add the name of the county for each trail
@@ -271,6 +255,17 @@ def generate_trail_subsets_per_county():
         print(overall_score_norm_expr)
         arcpy.CalculateField_management("trails_intersect_gte_2_" + county, "Norm_Overall_Score_Per_County", overall_score_norm_expr, "PYTHON_9.3")
 
+# Rank a feature class features according to a specific attribute value
+def generate_ranked_subset(in_feature_class, ranking_attribute, out_feature_class):
+    # Sort the attribute table
+    arcpy.Sort_management(in_feature_class, out_feature_class, [[ranking_attribute, "DESCENDING"]])
+    # Add a Rank attribute and populate it
+    arcpy.AddField_management(out_feature_class, "Rank", "LONG")
+    arcpy.CalculateField_management(out_feature_class, "Rank", "!OBJECTID!", "PYTHON_9.3")
+    # Also generate a separate feature class with the top 20 values
+    arcpy.SelectLayerByAttribute_management(out_feature_class, "NEW_SELECTION", "Rank <= 20")
+    arcpy.CopyFeatures_management(out_feature_class, out_feature_class + "_Top20" )
+    arcpy.SelectLayerByAttribute_management(out_feature_class, "CLEAR_SELECTION")
 
 # Rank each county-specific trail feature class
 def generate_ranked_subsets_per_county():
@@ -296,7 +291,6 @@ def preprocess_layers():
 
 def generate_scores():
     compute_trail_scores()
-    generate_ranked_subsets()
     generate_trail_subsets_per_county()
     generate_ranked_subsets_per_county()
 

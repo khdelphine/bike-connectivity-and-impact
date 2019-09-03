@@ -5,7 +5,7 @@
 # Purpose: This Arcpy script identifies the LTS3 road segments with the highest connectivity and community impact score.
 # Project: Connectivity and community impact analysis in Arcpy for potential bicycle infrastructure improvements.
 # Extent: 4 PA Counties in Philadelphia suburbs.
-# Last updated: May 14, 2019
+# Last updated: Sep 2, 2019
 # Author: Delphine Khanna
 # Organization: Bicycle Coalition of Greater Philadelphia
 # Note: This Arcpy script is meant to run in ArcGIS Desktop. It is NOT optimized for complete unsupervised automation.
@@ -46,9 +46,9 @@ def load_main_data():
                                         "aggregated_lts3_top30pct_with_cii_scores")
         turn_off_layers(["aggregated_lts3_top30pct_with_cii_scores"])
 
-# Select the top 30% LTS3 road segments
+# Select the top 30% LTS3 road segments. Note: those are the top 30% for each county, not overall.
 def select_top30pct_lts3():
-    # Select the top 30% LTS3 road segments using the attribute Top30percent
+    # Select the top 30% LTS3 road segments using the attribute Top30percent. 
     arcpy.SelectLayerByAttribute_management("lts3_orig", "NEW_SELECTION", "Top30perce = 1")
     # Save to a new feature class and do some clean up
     arcpy.CopyFeatures_management("lts3_orig", "lts3_top30pct")
@@ -59,7 +59,7 @@ def buffer_lts3():
     arcpy.Buffer_analysis("lts3_top30pct", "lts3_top30pct_buffered", "1609.34 Meters", "FULL", "ROUND")
 
 # Compute CII scores per LTS3 road segment. The loop is a work around the fact that
-# arcpy.sa.ZonalStatisticsAsTable() does not work for overlapping zone.
+# arcpy.sa.ZonalStatisticsAsTable() does not work for overlapping zones.
 def compute_CII_scores_per_lts3():
     # Prepare everything before the loop
     arcpy.CheckOutExtension("Spatial")
@@ -202,9 +202,14 @@ def generate_top_ranked_subset(in_feature_class, ranking_attribute, out_feature_
     arcpy.SelectLayerByAttribute_management(out_feature_class, "NEW_SELECTION", "Rank <= " + str(one_third_rows))
     arcpy.CopyFeatures_management(out_feature_class, out_feature_class + "_top10pct" )
     arcpy.SelectLayerByAttribute_management(out_feature_class, "CLEAR_SELECTION")
+<<<<<<< HEAD
     symbolize_vectors(out_feature_class, lyr_file_param = "lts3_overall_score_top10pct")
 
 # Generate the original top 10% subset for a specific county
+=======
+
+# Generate the original top 10% subset for a specific county. This is for comparison's sake.
+>>>>>>> aea618db63d54a35d4ff16efe3cd79c9a8ccc940
 def generate_LTS3_orig_10pct_subsets_per_county(county_name):
     # Select the top 10% LTS3 road segments using the original attribute Top10percent
     arcpy.SelectLayerByAttribute_management("lts3_with_cii_scores_" + county_name, "NEW_SELECTION",
@@ -215,8 +220,8 @@ def generate_LTS3_orig_10pct_subsets_per_county(county_name):
     arcpy.SelectLayerByAttribute_management("lts3_with_cii_scores_" + county_name, "CLEAR_SELECTION")
     symbolize_vectors("lts3_with_cii_scores_" + county, lyr_file_param = "lts3_orig_10pct")
 
-# Generate top 10% subsets for all 4 counties and on two different sorting criteria:
-# the new overall score and the original connectivity score)
+# For each county, generate top 10% subsets based on two different criteria:
+# the new overall score and the original connectivity score. The latter is for comparison's sake.
 def generate_LTS3_10pct_subsets_per_county():
     for county in county_list:
         generate_top_ranked_subset("lts3_with_cii_scores_" + county, "Norm_Overall_Score_Per_County",
@@ -226,7 +231,7 @@ def generate_LTS3_10pct_subsets_per_county():
 def load_and_initiate():
     if COMPUTE_FROM_SCRATCH_OPTION == "yes":
         prep_gdb()
-    #load_ancillary_layers()
+    load_ancillary_layers()
     set_up_env("roads")
     load_main_data()
 
@@ -238,14 +243,21 @@ def preprocess_layers():
         aggregate_all_zonalTables()
 
 def generate_scores():
-    #compute_overall_scores()
+    compute_overall_scores()
     generate_LTS3_subsets_per_county()
     generate_LTS3_10pct_subsets_per_county()
 
+<<<<<<< HEAD
+=======
+def symbolize_new_files():
+    symbolize_vectors(vectors_to_symbolize)
+    symbolize_rasters(["cii_overall_score_ras1"], recalc_stats = "no")
+
+>>>>>>> aea618db63d54a35d4ff16efe3cd79c9a8ccc940
 # ***************************************
 # Begin Main
 print_time_stamp("Start")
 load_and_initiate()
-#preprocess_layers()
+preprocess_layers()
 generate_scores()
 print_time_stamp("Done")
